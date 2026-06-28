@@ -1,0 +1,22 @@
+[package]
+name = "linkscope"
+description = "In-process linker and compiler pipeline profiler"
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+publish = false
+
+[workspace]
+members = [".", "linkscope-macros"]
+resolver = "2"
+
+[features]
+default = ["runtime", "macros"]
+json = ["dep:serde", "dep:serde_json"]
+macros = ["dep:linkscope-macros"]
+runtime = ["macros", "linkscope-macros/runtime"]
+
+[dependencies]
+linkscope-macros = { path = "linkscope-macros", optional = true }
+serde = { version = "1", features = ["derive"], optional = true }
+serde_json = { version = "1", optional = true }
