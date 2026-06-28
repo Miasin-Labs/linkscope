@@ -11,6 +11,7 @@ enum TraceValue {
     Signed(i64),
     Bytes(u64),
     Hex(u64),
+    Addr(u64),
     ByteRange { start: u64, len: u64 },
     AddrRange { start: u64, len: u64 },
 }
@@ -54,7 +55,7 @@ impl TraceField {
     pub const fn addr(name: &'static str, value: u64) -> Self {
         Self {
             name,
-            value: TraceValue::Hex(value),
+            value: TraceValue::Addr(value),
         }
     }
 
@@ -78,6 +79,28 @@ impl TraceField {
             value: format_value(&self.value),
         }
     }
+
+    pub(crate) fn profile(&self) -> crate::profile::Field {
+        crate::profile::Field {
+            name: self.name.to_owned(),
+            value: match &self.value {
+                TraceValue::Text(value) => crate::profile::FieldValue::Text(value.clone()),
+                TraceValue::Count(value) => crate::profile::FieldValue::Count(*value),
+                TraceValue::Signed(value) => crate::profile::FieldValue::Signed(*value),
+                TraceValue::Bytes(value) => crate::profile::FieldValue::Bytes(*value),
+                TraceValue::Hex(value) => crate::profile::FieldValue::Hex(*value),
+                TraceValue::Addr(value) => crate::profile::FieldValue::Addr(*value),
+                TraceValue::ByteRange { start, len } => crate::profile::FieldValue::ByteRange {
+                    start: *start,
+                    len: *len,
+                },
+                TraceValue::AddrRange { start, len } => crate::profile::FieldValue::AddrRange {
+                    start: *start,
+                    len: *len,
+                },
+            },
+        }
+    }
 }
 
 fn format_value(value: &TraceValue) -> String {
@@ -87,6 +110,7 @@ fn format_value(value: &TraceValue) -> String {
         TraceValue::Signed(value) => value.to_string(),
         TraceValue::Bytes(value) => crate::fmt::human(*value),
         TraceValue::Hex(value) => format!("{value:#x}"),
+        TraceValue::Addr(value) => format!("{value:#x}"),
         TraceValue::ByteRange { start, len } => format_range(*start, *len),
         TraceValue::AddrRange { start, len } => format_range(*start, *len),
     }

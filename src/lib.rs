@@ -4,6 +4,7 @@ mod counters;
 mod fmt;
 mod model;
 mod phase;
+mod profile;
 mod report;
 mod rss;
 mod trace;
@@ -25,6 +26,7 @@ pub use model::{
     TraceSnapshot,
 };
 pub use phase::{Span, enable, is_enabled, phase, record_bytes, record_items};
+pub use profile::{Field, FieldValue, Profile, Record, SourceLocation, ThreadInfo};
 pub use rss::record_rss;
 pub use trace::{
     TraceFrame,
@@ -89,6 +91,13 @@ pub fn snapshot() -> Snapshot {
             })
             .collect(),
     }
+}
+
+pub fn profile() -> Profile {
+    if !is_enabled() {
+        return Profile::default();
+    }
+    profile::from_trace_nodes(trace::snapshot_nodes())
 }
 
 #[cfg(feature = "json")]
