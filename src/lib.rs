@@ -2,6 +2,7 @@
 
 mod counters;
 mod fmt;
+mod mermaid;
 mod model;
 mod phase;
 mod profile;
@@ -98,6 +99,11 @@ pub fn profile() -> Profile {
         return Profile::default();
     }
     profile::from_trace_nodes(trace::snapshot_nodes())
+}
+
+#[must_use]
+pub fn to_mermaid_markdown() -> String {
+    mermaid::current_markdown()
 }
 
 #[cfg(feature = "json")]

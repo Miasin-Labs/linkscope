@@ -21,6 +21,7 @@ fn instrument_impl(item: TokenStream) -> TokenStream {
     let body = function.block;
     function.block = parse_quote!({
         let _linkscope_span = ::linkscope::phase(#name);
+        let _linkscope_trace = ::linkscope::trace(#name);
         #body
     });
     quote!(#function).into()
@@ -36,7 +37,7 @@ fn main_impl(item: TokenStream) -> TokenStream {
     let mut function = parse_macro_input!(item as ItemFn);
     let body = function.block;
     function.block = parse_quote!({
-        ::linkscope::enable();
+        ::linkscope::trace_enable();
         let _linkscope_report = ::linkscope::ReportGuard::new();
         #body
     });
